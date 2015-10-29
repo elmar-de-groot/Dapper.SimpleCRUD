@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -48,6 +49,14 @@ namespace Dapper.SimpleCRUDTests
                 throw new ApplicationException("Expected null");
             }
         }
+
+	    public static void IsEmpty(this IEnumerable<object> obj)
+	    {
+		    if (obj.Any())
+		    {
+			    throw new ApplicationException("Expected empty list");
+		    }
+	    }
 
     }
 }

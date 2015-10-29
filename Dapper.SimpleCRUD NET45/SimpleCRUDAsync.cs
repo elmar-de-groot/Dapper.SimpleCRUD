@@ -444,7 +444,37 @@ namespace Dapper
             return connection.ExecuteAsync(sb.ToString(), null, transaction, commandTimeout);
         }
 
-        /// <summary>
+		/// <summary>
+		/// <para>Deletes a list of records in the database</para>
+		/// <para>By default deletes records in the table matching the class name</para>
+		/// <para>-Table name can be overridden by adding an attribute on your class [Table("YourTableName")]</para>
+		/// <para>Deletes records where that match the where clause</para>
+		/// <para>whereConditions is an anonymous type to filter the results ex: new {Category = 1, SubCategory=2}</para>
+		/// <para>The number of records effected</para>
+		/// <para>Supports transaction and command timeout</para>
+		/// </summary>
+		public static Task<int> DeleteListAsync<T>(this IDbConnection connection, object whereConditions, IDbTransaction transaction = null, int? commandTimeout = null)
+	    {
+			var currenttype = typeof(T);
+			var name = GetTableName(currenttype);
+
+			var sb = new StringBuilder();
+			sb.AppendFormat("Delete from {0}", name);
+
+			var whereprops = GetAllProperties(whereConditions).ToArray();
+			if (whereprops.Any())
+			{
+				sb.Append(" where ");
+				BuildWhere(sb, whereprops, (T)Activator.CreateInstance(currenttype));
+			}
+
+			if (Debugger.IsAttached)
+				Trace.WriteLine(String.Format("DeleteList<{0}> {1}", currenttype, sb));
+
+			return connection.ExecuteAsync(sb.ToString(), whereConditions, transaction, commandTimeout);
+	    }
+
+	    /// <summary>
         /// <para>By default queries the table matching the class name</para>
         /// <para>-Table name can be overridden by adding an attribute on your class [Table("YourTableName")]</para>
         /// <para>Supports transaction and command timeout</para>

@@ -219,6 +219,32 @@ namespace Dapper.SimpleCRUDTests
             }
         }
 
+		public void TestDeleteListWithWhereCondition()
+		{
+			using (var connection = GetOpenConnection())
+			{
+				for (var i = 0; i < 10; i++)
+				{
+					connection.Insert(new User { Name = "TestDeleteListWithWhereCondition", Age = 10 });
+				}
+				connection.DeleteList<User>(new { Name = "TestDeleteListWithWhereCondition" });
+				connection.GetList<User>(new { Name = "TestDeleteListWithWhereCondition" }).IsEmpty();
+			}
+		}
+
+		public void TestDeleteListAsyncWithWhereCondition()
+		{
+			using (var connection = GetOpenConnection())
+			{
+				for (var i = 0; i < 10; i++)
+				{
+					connection.Insert(new User { Name = "TestDeleteListWithWhereCondition", Age = 10 });
+				}
+				connection.DeleteListAsync<User>(new { Name = "TestDeleteListWithWhereCondition" });
+				connection.GetList<User>(new { Name = "TestDeleteListWithWhereCondition" }).IsEmpty();
+			}
+		}
+
         public void TestSimpleGetList()
         {
             using (var connection = GetOpenConnection())
